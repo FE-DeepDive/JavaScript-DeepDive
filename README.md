@@ -1,7 +1,5 @@
 ## 👨‍💻 Contributers
 
-<br />
-
 <table >
   <tr height="130px">
     <td align="center" width="130px">
