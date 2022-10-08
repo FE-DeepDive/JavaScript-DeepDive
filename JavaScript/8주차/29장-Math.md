@@ -145,3 +145,5 @@ console.log(Math.min(10, 20, 30)); // 10
     ```js
     console.log(Math.min(...[10, 20, 30])); // 10
     ```
+
+<br>
