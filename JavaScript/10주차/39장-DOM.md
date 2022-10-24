@@ -1,3 +1,125 @@
+## DOM
+
+> HTML 문서의 계층적 구조와 정보를 표현하며 이를 제어할 수 있는 API를 제공하는 트리 자료구조입니다.
+
+<br>
+
+## DOM이 꼭 필요해?
+
+DOM이 존재해야하는 이유는 무엇일까요?
+
+MDN에서는 DOM이 필요한 이유를 다음과 같이 설명하고 있어요.
+
+```
+DOM은 문서의 구조화된 표현(structured representation)을 제공하며
+프로그래밍 언어가 DOM 구조에 접근할 수 있는 방법을 제공하여 그들이 문서 구조, 스타일, 내용 등을 변경할 수 있게 돕는다.
+DOM 은 nodes와 objects로 문서를 표현한다.
+이들은 웹 페이지를 스크립트 또는 프로그래밍 언어들에서 사용될 수 있게 연결시켜주는 역할을 담당한다.
+```
+
+다른 외국 자료를 찾아보니 맥락이 비슷하더군요!
+
+```
+the browser creates a representation of the document known as the Document Object Model.
+This model allows JavaScript to access the text content and elements of the website document as objects.
+```
+
+결국 DOM이 필요한 핵심 이유는 ✅JavaScript 때문이었습니다.
+
+왜냐하면 JavaScript가 문서의 내용을 동적으로 조작하려면, 그 전에 문서가 객체 형태로 되어야 접근이 가능하기 때문이죠.
+
+DOM은 그 조작을 위한 중간다리 역할을 해주신다고 보시면 됩니다.
+
+<br>
+
+## 노드 (node)
+
+> HTML 요소를 객체화한 것으로서, DOM을 구성하는 기본 요소입니다.
+
+#### HTML 요소와 노드 객체
+
+HTML 요소가 무엇인지 기억나시나요?
+
+HTML 요소는 말 그대로 HTML 문서를 구성하는 개별적인 요소를 의미합니다.
+
+이 HTML 요소는 렌더링 엔진에 의해 파싱되어 `요소 노드 객체`로 변환됩니다.
+
+그리고 요소의 어트리뷰트는 `어트리뷰 노드`가 되고, 텍스트 콘텐츠는 `텍스트 노드`로 변환됩니다.
+
+<img src="../img/chapter39/dom-nodes.png">
+
+<br>
+<br>
+
+#### 트리 자료구조
+
+트리 자료구조의 핵심은 **계층적**이라는 것입니다.
+
+즉, 부모와 자식같은 계층적 구조로 이루어진 것이죠.
+
+이러한 트리 자료구조는 단 한개의 최상위 노드에서 시작을 하게 됩니다.
+
+여기서 최상위 노드는 `루트 노드(root node)` 그리고 자식 노드가 없는 노드를 `리프 노드(leaf node)`라고 합니다.
+
+<img src="../img/chapter39/tree-data-structure.jpeg">
+
+한마디로 **DOM**은 **노드 객체들의 계층적 구조를 보여주는 트리 자료구조**라고 볼 수 있겠네요.
+
+<br>
+
+#### 문서 노드
+
+> HTML 문서 전체를 가리키는 객체입니다. DOM의 최상위에 존재합니다.
+
+노드의 종류는 크게 4가지로 분류할 수 있습니다.
+
+-   문서 노드(document node)
+-   요소 노드(element node)
+-   어트리뷰트 노드(attribute node)
+-   텍스트 노드(text node)
+
+이중에서 문서 노드만 잠깐 언급하고 넘어가겠습니다.
+
+문서 노드는 DOM 트리의 최상위에 존재하는 루트 노드로서, **document 객체**를 가리킵니다.
+
+그러면 document 객체는 무엇일까요?
+
+document 객체는 <u>HTML 문서 전체를 가리키는 객체</u>입니다.
+
+이는 전역 객체 window의 document 프로퍼티에 바인딩되어 있습니다.
+
+그래서 문서 노드는 window.document 혹은 document로 참조가 가능한 것입니다.
+
+문서 노드(document 객체)는 DOM 트리에 노드들이 접근하기 위한 진입점(entry point) 역할을 합니다.
+
+즉, 요소, 어트리뷰트, 텍스트 노드에 접근하려면 🚙문서 노드를 통해야하는 것이죠.
+
+(그래서 저희가 document.querySelector 등으로 요소를 잡아오기 앞서서 document를 항상 써줬던 이유이겠네요.)
+
+<br>
+
+## 노드 객체의 상속 구조
+
+앞에서 말씀드렸듯, 노드도 결국 객체입니다.
+
+즉, **자바스크립트 객체이기에 프로토타입에 의한 상속 구조**를 갖게됩니다.
+
+따라서 프로토타입 체인에 있는 모든 프로토타입의 프로퍼티나 메서드를 상속받아서 사용 가능합니다.
+
+<img src="../img/chapter39/node-inheritance-structure.png">
+
+아래는 노드 객체가 갖는 특성들입니다.
+
+-   `Object`: JS 객체의 특성을 가집니다.
+-   `EventTarget`: 이벤트를 발생시킬 수 있습니다. (EventTarget.addEventListener 사용 가능)
+-   ` Node`: 트리 자료 구조에 속합니다. 트리 탐색 기능(Node.parentNode, Node.childNodes 등), 노드 정보 제공 기능 등을 사용할 수 있습니다.
+-   `Element`: 브라우저가 렌더링할 수 있는 웹 문서의 요소를 표현한 객체입니다.
+-   `HTMLElement`: HTML 요소를 표현한 객체입니다.
+
+노드 객체는 공통된 기능일수록 프로토타입 체인의 상위에, 개별적인 고유 기능일 수록 프로토타입 체인의 하위에 프로토타입 체인을 구축하였습니다.
+
+<br>
+
 ## DOM 조작
 
 > 새로운 노드를 생성하여 DOM에 추가하거나 기존 노드를 삭제 or 교체하는 것을 말합니다.
@@ -447,3 +569,11 @@ data 어트리뷰트의 data- 접두사 다음에 존재하지 않는 이름을 
     </body>
 </html>
 ```
+
+#### 참고자료
+
+<hr>
+
+-   [How To Understand and Modify the DOM in JavaScript — Tania Rascia](https://www.digitalocean.com/community/tutorials/introduction-to-the-dom)
+
+-   [MDN, DOM 소개 ](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction)
