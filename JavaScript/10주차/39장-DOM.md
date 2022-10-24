@@ -352,8 +352,195 @@ getter, setter 모두 존재하는 접근자 프로퍼티로, 요소 노드의 �
         <script>
             // #foo 요소 노드의 모든 자식 노드가 제거되고 할당한 문자열이 텍스트로 추가됩니다.
             // 이때 HTML 마크업이 파싱되지는 않습니다.
-            document.getElementById('foo').textContent =
-                '안녕하세요 <span>유재석씨!</span>';
+            document.getElementById('foo').textContent = '안녕하세요 <span>유재석씨!</span>';
+        </script>
+    </body>
+</html>
+```
+
+<br>
+
+## 노드 생성과 추가
+
+#### createElement
+
+> 요소 노드를 생성하여 반환합니다.
+
+매개변수에는 태그 이름을 나타내는 문자열을 인수로 전달합니다.
+
+#### createTextNode
+
+> 텍스트 노드를 생성하여 반환합니다.
+
+매개변수에는 텍스트 노드의 값으로 사용할 문자열을 인수로 전달합니다.
+
+#### appendChild
+
+> 인수로 전달 받은 노드를 마지막 자식 노드로 추가합니다.
+
+지금까지 사용된 메서드를 예제를 통해서 봅시다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul id="animals">
+            <li class="bird">Bird</li>
+        </ul>
+        <script>
+            const $animals = document.getElementById('animals');
+
+            // 1. 요소 노드 생성
+            const $li = document.createElement('li');
+
+            // 2. 텍스트 노드 생성
+            const textNode = document.createTextNode('Lion');
+
+            // 3. 텍스트 노드를 $li 요소 노드의 자식 노드로 추가
+            $li.appendChild(textNode);
+
+            // $li 요소 노드를 #animals 요소 노드의 마지막 자식 노드로 추가
+            $animals.appendChild($li);
+        </script>
+    </body>
+</html>
+```
+
+### 복수의 노드 생성과 추가 (feat. DocumentFragment)
+
+아래 예제와 같이 여러 개의 노드를 추가하는 경우, 리플로우와 리페인트가 3번 실행되는 👾문제가 생깁니다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul id="animals"></ul>
+        <script>
+            const $animals = document.getElementById('animals');
+
+            ['Pig', 'Bird', 'Lion'].forEach((text) => {
+                // 1. 요소 노드 생성
+                const $li = document.createElement('li');
+
+                // 2. 텍스트 노드 생성
+                const textNode = document.createTextNode(text);
+
+                // 3. 텍스트 노드를 $li 요소 노드의 자식 노드로 추가
+                $li.appendChild(textNode);
+
+                // $li 요소 노드를 #animals 요소 노드의 마지막 자식 노드로 추가
+                $animals.appendChild($li);
+            });
+        </script>
+    </body>
+</html>
+```
+
+이러한 문제는 **DocumentFragment 노드**를 통해서 해결할 수 있습니다.
+
+즉, DocumentFragment 노드가 컨테이너 역할을 하고 여기에 자식 노드를 모두 추가하고 한 번만 DOM이 변경되게 하는 것이죠.
+
+DocumentFragment 노드의 유용한 특징은 부모 노드가 없어서 <u>기존 DOM과는 별도로 존재</u>한다는 점입니다.
+
+이러한 성질 덕분에 자식 노드를 추가하여도 기존 DOM에는 어떠한 변경도 발생하지 않습니다.
+
+그러면서도 DocumentFragment 노드를 DOM에 추가하면 자신은 제거되고 자신의 자식 노드만 DOM에 추가됩니다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul id="animals"></ul>
+        <script>
+            const $animals = document.getElementById('animals');
+
+            // DocumentFragment 노드를 생성합니다.
+            const $fragment = document.createDocumentFragment();
+
+            ['Pig', 'Bird', 'Lion'].forEach((text) => {
+                // 1. 요소 노드 생성
+                const $li = document.createElement('li');
+
+                // 2. 텍스트 노드 생성
+                const textNode = document.createTextNode(text);
+
+                // 3. 텍스트 노드를 $li 요소 노드의 자식 노드로 추가
+                $li.appendChild(textNode);
+
+                // $li 요소 노드를 DocumentFragment 노드의 마지막 자식 노드로 추가
+                $fragment.appendChild($li);
+            });
+
+            $animals.appendChild($fragment);
+        </script>
+    </body>
+</html>
+```
+
+이처럼 여러 개의 요소 노드를 DOM에 추가하는 경우 DocumentFragment 노드를 사용하는 것이 효율적입니다.
+
+<br>
+
+#### cloneNode
+
+> 노드의 사본을 생성하여 반환합니다.
+
+매개변수에 true를 인수로 전달하면 깊은복사를 하여 모든 자손 노드가 포함된 사본을 생성합니다.
+
+반면, false로 인수를 전달하거나 생략하면 얕은 복사를 하여 노드 자신만의 사본을 생성합니다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul id="animals">
+            <li>Pig</li>
+        </ul>
+        <script>
+            const $animals = document.getElementById('animals');
+            // 첫번째 자식 요소 노드를 반환합니다.
+            const $pig = $animals.firstElementChild;
+
+            // $pig 요소를 얕은 복사하여 사본을 생성합니다.
+            // 텍스트 노드가 없는 사본이 생성됩니다.
+            const $shallowClone = $pig.cloneNode();
+
+            // 사본 요소에 텍스트 노드를 추가합니다.
+            $shallowClone.textContent = 'Bird';
+
+            // 사본 요소 노드를 #animals 요소 노드의 마지막에 추가합니다.
+            $animals.appendChild($shallowClone);
+
+            // #animals 요소를 깊은 복사하여 모든 자손 노드가 포홤된 사본을 생성합니다.
+            const $deepClone = $animals.cloneNode(true);
+            // 사본 요소 노드를 #animals 요소 노드의 마지막 노드로 추가합니다.
+            $animals.appendChild($deepClone);
+        </script>
+    </body>
+</html>
+```
+
+<br>
+
+#### removeChild
+
+> 인수로 전달한 노드를 DOM에서 삭제합니다.
+
+단❗️ 인수로 전달한 노드는 removeChild 메서드를 호출한 노드의 자식 노드이어야 합니다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul id="animals">
+            <li>Pig</li>
+            <li>Bird</li>
+        </ul>
+        <script>
+            const $animals = document.getElementById('animals');
+
+            // #animals 요소 노드의 마지막 요소를 DOM에서 삭제합니다.
+            $animals.removeChild($animals.lastElementChild);
         </script>
     </body>
 </html>
@@ -442,8 +629,7 @@ innerHTML 프로퍼티를 사용하면 HTML 마크업 문자열로 간단히 DOM
         <div id="foo"></div>
         <script>
             // 에러 이벤트를 강제로 발생시켜 자바스크립트 코드가 실행되도록 합니다.
-            document.getElementById('foo').innerHTML =
-                '<img src="x" onerror="alert(document.cookie)">';
+            document.getElementById('foo').innerHTML = '<img src="x" onerror="alert(document.cookie)">';
         </script>
     </body>
 </html>
@@ -809,6 +995,53 @@ data 어트리뷰트의 data- 접두사 다음에 존재하지 않는 이름을 
         </script>
     </body>
 </html>
+```
+
+## class 조작
+
+> `classList`를 잘 알아둡시다!
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <style>
+            .box {
+                width: 100px;
+                height: 100px;
+                background-color: cadetblue;
+            }
+            .red {
+                color: red;
+            }
+            .blue {
+                color: blue;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="box red">안녕~</div>
+        <script>
+            const $box = document.querySelector('.box');
+
+            // .box 요소의 class 어트리뷰트 정보를 담은 DOMTokenList 객체를 취득합니다.
+            // classList가 변화하는 DOMTokenList 객체는 HTMLCollection과 NodeList와 같이
+            // 노드 객체의 상태 변화를 실시간으로 반영하는 살아있는 객체입니다.
+            console.log($box.classList); // DOMTokenList(2) ['box', 'red', value: 'box red']
+
+            // .box 요소의 class 어트리뷰트 값 중에 'red'만 'blue'로 변경
+            $box.classList.replace('red', 'blue');
+        </script>
+    </body>
+</html>
+```
+
+```js
+$box.classList.add('foo'); // 클래스를 추가합니다.
+$box.classList.remove('foo'); // 클래스 이름 제거합니다.
+$box.classList.contains('box'); // true;
+$box.classList.replace('red', 'blue'); // 클래스 이름을 red에서 blue로 변경합니다.
+$box.classList.toggle('foo'); // 클래스 이름 존재하면 제거하고, 아니면 추가됩니다.
 ```
 
 #### 참고자료
