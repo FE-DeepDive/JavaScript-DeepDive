@@ -78,6 +78,15 @@ HTML 요소는 말 그대로 HTML 문서를 구성하는 개별적인 요소를 
 -   어트리뷰트 노드(attribute node)
 -   텍스트 노드(text node)
 
+<br>
+
+<img src="../img/chapter39/dom-tree.png">
+
+<br>
+<br>
+
+이 구조도에서 흥미로운 것은 텍스트 노드는 요소 노드의 자식 노드이고, 어트리뷰트 노드는 요소 노드와 연결되어 있다는 점입니다.
+
 이중에서 문서 노드만 잠깐 언급하고 넘어가겠습니다.
 
 문서 노드는 DOM 트리의 최상위에 존재하는 루트 노드로서, **document 객체**를 가리킵니다.
@@ -117,6 +126,238 @@ document 객체는 <u>HTML 문서 전체를 가리키는 객체</u>입니다.
 -   `HTMLElement`: HTML 요소를 표현한 객체입니다.
 
 노드 객체는 공통된 기능일수록 프로토타입 체인의 상위에, 개별적인 고유 기능일 수록 프로토타입 체인의 하위에 프로토타입 체인을 구축하였습니다.
+
+<br>
+
+## 요소 노드 취득
+
+> 요소 노드의 취득은 HTML 요소를 조작하는 시작점입니다.
+
+만약 취득하려는 HTML 요소가 존재하지 않는 경우에는 `null`을 반환하거나 빈 객체를 반환합니다.
+
+DOM은 요소 노드를 취득할 수 있는 다양한 메서드를 제공합니다.
+
+그렇지만, id 어트리뷰트가 있는 경우에만 `getElementById` 메서드를 사용하고 그 외에는 `querySelector`, `querySelectorAll` 메서드를 권장합니다.
+
+왜냐하면 querySelector, querySelectorAll 메서드 같은 CSS 선택자 문법을 사용할 때는 다른 메서드들보다 느리지만, 구체적이고 일관된 방식으로 요소를 취득할 수 있기 때문입니다.
+
+예제를 같이 살펴보시죠.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul id="animal">
+            <li id="pig">Pig</li>
+            <li id="bird">Bird</li>
+            <li id="lion">Lion</li>
+        </ul>
+        <script>
+            // getElementById 메서드는 Document.prototype의 프로퍼티입니다.
+            // getElementById 메서드는 언제나 단 하나의 요소 노드를 반환합니다.
+            const $bird = document.getElementById('bird');
+
+            // 취득한 요소 노드의 style.color 프로퍼티 값을 변경합니다.
+            $bird.style.color = 'blue';
+        </script>
+    </body>
+</html>
+```
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul>
+            <li class="pig">Pig</li>
+            <li class="bird">Bird</li>
+            <li class="lion">Lion</li>
+        </ul>
+        <script>
+            // querySelector 메서드는 인수로 전달한 CSS 선택자를 만족시키는 하나의 요소 노드를 탐색하여 반환합니다.
+            const $bird = document.querySelector('.bird');
+
+            // 취득한 요소 노드의 style.color 프로퍼티 값을 변경합니다.
+            $bird.style.color = 'blue';
+        </script>
+    </body>
+</html>
+```
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul>
+            <li class="pig">Pig</li>
+            <li class="bird">Bird</li>
+            <li class="lion">Lion</li>
+        </ul>
+        <script>
+            // querySelectorAll 메서드는 NodeList 객체를 반환합니다.
+            // ul 요소의 자식 요소인 li 요소를 모두 탐색하여 반환합니다.
+            const $elems = document.querySelectorAll('ul > li');
+
+            // 취득한 요소들은 NodeList 객체에 담겨 반환됩니다.
+            console.log($elems); // NodeList(3) [li.pig, li.bird, li.lion]
+
+            // 취득한 모든 요소 노드의 style.color 프로퍼티 값을 변경합니다.
+            // NodeList는 forEach 메서드를 제공합니다.
+            $elems.forEach((elem) => {
+                elem.style.color = 'blue';
+            });
+        </script>
+    </body>
+</html>
+```
+
+추가로 특정 요소 노드를 취득할 수 있는지 확인하는 메서드가 있습니다.
+
+`Element.prototype.matches` 메서드입니다.
+
+이 메서드는 이벤트 위임시에 유용하다고 하니 알아둡시다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul id="animals">
+            <li class="pig">Pig</li>
+            <li class="bird">Bird</li>
+            <li class="lion">Lion</li>
+        </ul>
+        <script>
+            const $pig = document.querySelector('.pig');
+
+            // $pig 노드는 #animals > li.pig로 취득할 수 ✅ 있습니다.
+            console.log($pig.matches('#animals > li.pig')); // true
+
+            // $pig 노드는 #animals > li.bird로  취득할 수 🚫없습니다.
+            console.log($pig.matches('#animals > li.bird')); // false
+        </script>
+    </body>
+</html>
+```
+
+#### HTMLCollection과 NodeList
+
+> DOM API가 여러 개의 결과 값을 반환하기 위한 DOM 컬렉션 객체입니다.
+
+HTMLCollection과 NodeList 모두 **유사 배열 객체이면서 이터러블**입니다.
+
+따라서 `for...of`문으로 순회가능하고, 스프레드 문법을 사용하여 간단히 배열로 변환이 가능합니다.
+
+책에서는 안전하게 DOM 컬렉션을 사용하려면 HTMLCollection과 NodeList 객체를 **배열로 변환하여 사용하는 것을 권장하고 있습니다.**
+
+왜냐하면 HTMLCollection과 NodeList 객체는 예상과 다르게 동작할 가능성이 있고, 상태 변경의 위험도 있기 때문입니다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul id="animals">
+            <li>Pig</li>
+            <li>Bird</li>
+            <li>Lion</li>
+        </ul>
+        <script>
+            const $animals = document.getElementById('animals');
+
+            // childNodes 프로퍼티는 NodeList 객체를 반환합니다.
+            const { childNodes } = $animals;
+
+            // 스프레드 문법을 사용하여 NodeList 객체를 배열로 반환합니다.
+            [...childNodes].forEach((childNode) => {
+                $animals.removeChild(childNode);
+            });
+
+            // $animals 요소의 모든 자식 노드가 삭제되었습니다.
+            console.log(childNodes); // NodeList []
+        </script>
+    </body>
+</html>
+```
+
+<br>
+
+## 노드 탐색
+
+> 취득한 요소 노드를 기점으로 DOM 트리 노드를 옮겨다니며 부모, 형제, 자식 노드 등을 탐색합니다.
+
+대표적으로 잘 쓰이는 노드 탐색 프로퍼티를 살펴보겠습니다.
+
+`Node.prototype.parentNode`: 부모 노드 탐색합니다.
+`Node.prototype.childNodes`: 자식 노드들을 NodeList에 담아 반환합니다.
+`Node.prototype.previousElementSibling(nextElementSibling)`: 형제 노드를 탐색하여 반환합니다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul id="animals">
+            <li class="pig">Pig</li>
+            <li class="bird">Bird</li>
+            <li class="lion">Lion</li>
+        </ul>
+        <script>
+            const $animals = document.getElementById('animals');
+            const $bird = document.querySelector('.bird');
+
+            // #animals 요소의 모든 자식 노드를 탐색합니다.
+            // childNodes 프로퍼티각 반환한 NodeList에는 요소 노드 뿐 아니라, 텍스트 노드도 포함되어있습니다.
+            console.log($animals.childNodes); // NodeList(7) [text, li.pig, text, li.bird, text, li.lion, text]
+
+            // .bird 요소 노드의 부모 노드를 탐색합니다.
+            console.log($bird.parentNode);
+            /*<ul id="animals">
+            <li class="pig">Pig</li>
+            <li class="bird">Bird</li>
+            <li class="lion">Lion</li>
+            </ul>*/
+
+            console.log($bird.nextElementSibling); // <li class="lion">Lion</li>
+
+            console.log($bird.previousElementSibling); // <li class="pig">Pig</li>
+        </script>
+    </body>
+</html>
+```
+
+<br>
+
+## 텍스트 조작
+
+대표적으로 `Node.prototype.textContent`가 있습니다.
+
+getter, setter 모두 존재하는 접근자 프로퍼티로, 요소 노드의 텍스트 노드와 모든 자손 노드의 텍스트를 모두 취하거나 변경합니다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <div id="foo">안녕 <span>김정희!</span></div>
+        <script>
+            // #foo 요소 노드의 텍스트를 모두 취득합니다. 이때 HTML 마크업은 무시됩니다.
+            console.log(document.getElementById('foo').textContent); // 안녕 김정희!
+        </script>
+    </body>
+</html>
+```
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <div id="foo">안녕 <span>김정희!</span></div>
+        <script>
+            // #foo 요소 노드의 모든 자식 노드가 제거되고 할당한 문자열이 텍스트로 추가됩니다.
+            // 이때 HTML 마크업이 파싱되지는 않습니다.
+            document.getElementById('foo').textContent =
+                '안녕하세요 <span>유재석씨!</span>';
+        </script>
+    </body>
+</html>
+```
 
 <br>
 
