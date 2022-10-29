@@ -218,11 +218,15 @@ const xhr = new XMLHttpRequest();
 
 -   status: HTTP 요청에 대한 응답 상태를 나타내는 정수입니다. ex) 200
 
+<br>
+
 #### XMLHttpRequest 객체의 이벤트 핸들러 프로퍼티
 
 -   onreadystatechange: readyState 프로퍼티 값이 변경된 경우입니다.
 -   onerror: HTTP 요청에 에러가 발생한 경우입니다.
 -   onload: HTTP 요청이 성공적으로 완료한 경우입니다.
+
+<br>
 
 #### XMLHttpRequest 객체의 메서드
 
@@ -238,6 +242,8 @@ const xhr = new XMLHttpRequest();
 2. XMLHttpRequest.prototype.setRequestHeader 메서드로 특정 HTTP 요청의 헤더 값을 설정합니다.
 3. XMLHttpRequest.prototype.send 메서드로 HTTP 요청을 전송합니다.
 
+<br>
+
 #### XMLHttpRequest.prototype.open
 
 ```js
@@ -250,6 +256,8 @@ XMLHttpRequest.open(method, url[, async[, user[, password]]])
 -   url: HTTP 요청을 전송할 URL
 -   async: 비동기 요청 여부
 
+<br>
+
 #### XMLHttpRequest.prototype.send
 
 > open 메서드로 초기화된 HTTP 요청을 서버에 전송합니다.
@@ -258,6 +266,8 @@ GET, POST 요청 메서드에 따라 전송 방식에 차이가 있습니다.
 
 -   GET: 데이터의 URL의 일부분인 쿼리 문자열로 서버에 전송합니다.
 -   POST: 데이터(페이로드)를 몸체에 담아 전송합니다.
+
+<br>
 
 #### XMLHttpRequest.prototype.setRequestHeader
 
@@ -298,6 +308,14 @@ xhr.send();
 <br>
 
 ### HTTP 응답 처리
+
+서버가 전송한 응답을 처리하려면 XMLHttpRequest 객체가 발생시키는 이벤트를 캐치해야합니다.
+
+이는 XMLHttpRequest 객체의 이벤트 핸들러 프로퍼티를 통해서 이루어집니다.
+
+(onreadystatechange, onload, onerror)
+
+예를 들어 HTTP 요청의 현재 상태를 나타내는 readyState 프로퍼티 값이 변경된 경우 발생하는 readystatechange 이벤트를 캐치하여 HTTP 응답을 처리할 수 있습니다.
 
 ```js
 // XMLHttpRequest 객체를 생성합니다.
@@ -346,7 +364,7 @@ xhr.open('GET', 'https://jsonplaceholder.typicode.com/todos/1');
 // HTTP 요청을 전송합니다.
 xhr.send();
 
-// load 이벤트는 HTTP 요처이 성공적으로 완료된 경우 발생합니다.
+// load 이벤트는 HTTP 요청이 성공적으로 완료된 경우 발생합니다.
 xhr.onload = () => {
     // status 프로퍼티는 응답 상태 코드를 나타냅니다.
     // status 프로퍼티 값이 200이면 정상적으로 응답상태입니다.
