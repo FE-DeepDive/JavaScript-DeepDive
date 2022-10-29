@@ -40,13 +40,20 @@ JSON은 데이터를 주고 받을 때 가장 간단한 포맷 중 하나입니�
 
 > 객체를 JSON 포맷의 문자열로 변환합니다.
 
-클라이언트가 서버로 객체를 전송하려면 객체를 문자열화 하는데 이를 **직렬화(serializing)**라고 합니다.
+클라이언트가 서버로 객체를 전송하려면 객체를 문자열화 하는데 이를 **직렬화(serializing)** 라고 합니다.
 
 ❓ 직렬화는 왜 필요한 걸까요?
 
 기기마다 다른 가상 메모리 주소 공간을 가지기 때문에 참조형 타입의 데이터들은 전달할 수 없다고 합니다.
 
 따라서 주소 값이 아닌, Byte 형태(기본 원시 타입)로 직렬화된 데이터를 전달해야 파싱 가능한 데이터가 된다고 합니다.
+
+```js
+let json = JSON.stringify(value[, replacer, space])
+// value: 인코딩 하려는 값
+// replacer: JSON으로 인코딩 하길 원하는 프로퍼티가 담긴 배열. 또는 매핑 함수 function(key, value)
+// space: 서식 변경 목적으로 사용할 공백 문자 수
+```
 
 ```js
 const cat = {
@@ -64,6 +71,7 @@ const json = JSON.stringify(cat);
 console.log(typeof json, json);
 // string {"name":"Navi","color":"white","size":null,"birthDate":"2022-10-28T09:42:30.336Z"}
 
+// 객체를 JSON 포맷의 문자열로 변환하면서 들여쓰기 합니다.
 const preetyJson = JSON.stringify(cat, null, 2);
 console.log(typeof preetyJson, preetyJson);
 /*
@@ -273,6 +281,8 @@ GET, POST 요청 메서드에 따라 전송 방식에 차이가 있습니다.
 
 > 특정 HTTP 요청의 헤더 값을 설정합니다.
 
+cf) HTTP 헤더는 클라이언트와 서버가 요청 또는 응답으로 부가적인 정보를 전송할 수 있도록 해줍니다.
+
 setRequestHeader는 반드시 open 메서드 호출 이후에 호출해야합니다.
 
 자주 사용하는 HTTP 요청 헤더는 Content-type과 Aceept가 있습니다.
@@ -289,6 +299,8 @@ MIME 타입이란 클라이언트에게 전송된 문서의 다양성을 알려�
 그러므로, 각 문서와 함께 올바른 MIME 타입을 전송하도록, 서버가 정확히 설정하는 것이 중요합니다.
 브라우저들은 리소스를 내려받았을 때 해야 할 기본 동작이 무엇인지를 결정하기 위해 대게 MIME 타입을 사용합니다.
 ```
+
+cf) 미디어 타입(media type), MIME 타입(MIME type), 콘텐츠 타입(content type)은 인터넷에 전달되는 파일 포맷과 포맷 콘텐츠를 위한 식별자이다.
 
 ```js
 // XMLHttpRequest 객체를 생성합니다.
