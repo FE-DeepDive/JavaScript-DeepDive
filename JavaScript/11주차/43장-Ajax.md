@@ -205,9 +205,80 @@ const xhr = new XMLHttpRequest();
 
 ### XMLHttpRequest 객체의 프로퍼티와 메서드
 
+#### XMLHttpRequest 객체의 프로퍼티
+
+-   readyState: HTTP 요청의 현재 상태를 나타내는 정수입니다.
+    -   UNSENT:0 -> open 메서드 호출 이전
+    -   OPENED:1 -> open 메서드 호출 이후
+    -   HEADERS_RECEIVED:2 -> send 메서드 호출 이후
+    -   LOADING: 3 -> 서버 응답 중
+    -   DONE: 4 -> 서버 응답 완료
+
+<br>
+
+-   status: HTTP 요청에 대한 응답 상태를 나타내는 정수입니다. ex) 200
+
+#### XMLHttpRequest 객체의 이벤트 핸들러 프로퍼티
+
+-   onreadystatechange: readyState 프로퍼티 값이 변경된 경우입니다.
+-   onerror: HTTP 요청에 에러가 발생한 경우입니다.
+-   onload: HTTP 요청이 성공적으로 완료한 경우입니다.
+
+#### XMLHttpRequest 객체의 메서드
+
+-   open: HTTP 요청 초기화
+-   send: HTTP 요청 전송
+-   setRequestHeader: 특정 HTTP 요청 헤더의 값을 설정
+
 <br>
 
 ### HTTP 요청 전송
+
+1. XMLHttpRequest.prototype.open 메서드로 HTTP 요청을 초기화합니다.
+2. XMLHttpRequest.prototype.setRequestHeader 메서드로 특정 HTTP 요청의 헤더 값을 설정합니다.
+3. XMLHttpRequest.prototype.send 메서드로 HTTP 요청을 전송합니다.
+
+#### XMLHttpRequest.prototype.open
+
+```js
+XMLHttpRequest.open(method, url[, async[, user[, password]]])
+```
+
+매개변수는 다음과 같습니다.
+
+-   method: HTTP 요청 메서드 (GET, POST 등)
+-   url: HTTP 요청을 전송할 URL
+-   async: 비동기 요청 여부
+
+#### XMLHttpRequest.prototype.send
+
+> open 메서드로 초기화된 HTTP 요청을 서버에 전송합니다.
+
+GET, POST 요청 메서드에 따라 전송 방식에 차이가 있습니다.
+
+-   GET: 데이터의 URL의 일부분인 쿼리 문자열로 서버에 전송합니다.
+-   POST: 데이터(페이로드)를 몸체에 담아 전송합니다.
+
+#### XMLHttpRequest.prototype.setRequestHeader
+
+> 특정 HTTP 요청의 헤더 값을 설정합니다.
+
+setRequestHeader는 반드시 open 메서드 호출 이후에 호출해야합니다.
+
+자주 사용하는 HTTP 요청 헤더는 Content-type과 Aceept가 있습니다.
+
+Content-type은 요청 몸체에 담아 전송할 데이터의 MIME 타입의 정보를 표현합니다.
+
+-   text
+-   application
+-   multipart
+
+```
+MIME 타입이란 클라이언트에게 전송된 문서의 다양성을 알려주기 위한 메커니즘입니다
+웹에서 파일의 확장자는 별 의미가 없습니다.
+그러므로, 각 문서와 함께 올바른 MIME 타입을 전송하도록, 서버가 정확히 설정하는 것이 중요합니다.
+브라우저들은 리소스를 내려받았을 때 해야 할 기본 동작이 무엇인지를 결정하기 위해 대게 MIME 타입을 사용합니다.
+```
 
 ```js
 // XMLHttpRequest 객체를 생성합니다.
