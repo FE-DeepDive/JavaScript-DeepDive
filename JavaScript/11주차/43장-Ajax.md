@@ -287,6 +287,12 @@ setRequestHeader는 반드시 open 메서드 호출 이후에 호출해야합니
 
 자주 사용하는 HTTP 요청 헤더는 Content-type과 Aceept가 있습니다.
 
+Content-type은 HTTP 메시지에 보내는 데이터 형식을 알려주는 헤더입니다.
+
+만약 Content-type 헤더가 없다면 데이터를 받는 입장에서 단순히 텍스트 데이터로 받아드립니다.
+
+Accept는 서버에게 자신이 받을 수 있는 미디어 타입이 무엇인지 알려주기 위해 클라이언트가 사용합니다.
+
 Content-type은 요청 몸체에 담아 전송할 데이터의 MIME 타입의 정보를 표현합니다.
 
 -   text
