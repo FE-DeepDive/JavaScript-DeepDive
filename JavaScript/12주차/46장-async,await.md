@@ -151,3 +151,84 @@ console.log(generator.next()); // After 2 Before 3 { value: 3, done: false }
 
 console.log(generator.next()); // After 3 { value: undefined, done: true }
 ```
+
+제너레이터 객체의 next 메서드를 호출하면 yield 표현식까지 실행되고 일시 중지됩니다.
+
+이때 **함수의 제어권이 호출자로 양도(yield)됩니다.**
+
+이후 필요한 시점에 호출자가 또 다시 next 메서드를 호출하면 일시 중지된 코드부터 실행을 재개합니다.
+
+그리고 다음 yield 표현식까지 실행되고 또 다시 일시 중지됩니다.
+
+이때 제너레이터 객체의 **next 메서드는 value, done 프로퍼티를 갖는 이터레이터 리절트 객체를 반환합니다.**
+
+next 메서드가 반환한 이터레이터 리절트 객체의 value 프로퍼티에는 yield 표현식에서 yield된 값(yield 키워드 뒤의 값)이 할당됩니다.
+
+done 프로퍼티에는 제너레이터 함수가 끝까지 실행되었는지를 나타내는 불리언 값이 할당됩니다.
+
+제너레이터 객체의 **next 메서드에 전달한 인수는 제너레이터 함수의 yield 표현식을 할당받는 변수에 할당됩니다.**
+
+다른 예제를 같이 살펴보죠.
+
+```js
+function* genFunc() {
+    // 처음 next 메서드를 호출하면 첫 번째 yield 표현식까지 실행되고 일시 중단됩니다.
+    // 이때 yield된 값 1은 next 메서드가 반환한 이터레이터 리절트 객체의 vlaue 프로퍼티에 할당됩니다.
+    // a 변수에는 아직 아무것도 할당되지 않았습니다. a 변수의 값은 next 메서드가 두 번재 호출할 때 결정됩니다.
+    const a = yield 1;
+
+    // 두 번째 next 메서드를 호출할 때 전달한 인수 10은 첫 번째 yield 표현식을 할당받는 a 변수에 할당됩니다.
+    // 즉, const a = yield 1;은 두 번째 next 메서드를 호출했을 때 완료됩니다.
+    // 두 번째 next 메서드를 호출하면 두 번째 yield 표현식까지 실행되고 일시 중지됩니다.
+    // 이때 yield된 값 a + 10은 next 메서드가 반환한 이터레이터 리절트 객체의 value 프로퍼티에 할당됩니다.
+    const b = yield a + 10;
+
+    // 세 번째 next 메서드를 호출할 때 전달한 인수 20은 두 번째 yield 표현식을 할당받는 b 변수에 할당됩니다.
+    // 즉, const b = yield (a+10);는 세 번째 next 메서드를 호출했을 때 완료됩니다.
+    // 세 번째 next 메서드를 호출하면 함수 끝까지 실행됩니다.
+    // 이때, 제너레이터 함수의 반환 값 a+b는 next 메서드가 반환한 이터레이터 리절트 객체의 value 프로퍼티에 할당됩니다.
+    return a + b;
+}
+
+// 제너레이터 함수를 호출하면 제너레이터 객체를 반환합니다.
+const generator = genFunc();
+
+// 처음 호출하는 next 메서드에는 인수를 전달하지 않습니다.
+// 만약 처음 호출하는 next 메서드에 인수를 전달하면 무시됩니다.
+// next 메서드가 반환한 이터레이터 리절트 객체의 value 프로퍼티에는 첫 번째 yield된 값 1이 할당됩니다.
+let res = generator.next();
+console.log(res); // { value: 1, done: false }
+
+// next 메서드에 인수로 전달한 10은 genFunc 함수의 a변수에 할당됩니다.
+// next 메서드가 반환한 이터레이터 리절트 객체의 value 프로퍼티에는 두 번째 yield된 값 20이 할당됩니다.
+res = generator.next(10);
+console.log(res); // { value: 20, done: false }
+
+// next 메서드가 인수로 전달한 20은 genFunc 함수의 b 변수에 할당됩니다.
+// next 메서드가 반환한 이터레이터 리절트 객체의 value 프로퍼티에는 제너레이터 함수의 반환 값 30이 할당됩니다.
+res = generator.next(20);
+console.log(res); // { value: 30, done: true }
+```
+
+이처럼 제너레이터 함수는 next 메서드와 yield 표현식을 통해 함수 호출자와 상태를 주고 받을 수 있습니다.
+
+함수 호출자는 next 메서드를 통해 yield 표현식까지 함수를 실행시켜 리절트 객체의 value 프로퍼티에 할당된 값을 꺼내올 수 있습니다.
+
+그리고 next 메서드에 인수를 전달해서 제너레이터 객체에 상태(yield 표현식을 할당받는 변수)를 밀어넣을 수 있습니다.
+
+이러한 제너레이터 특성을 활용하면 비동기 처리를 동기처럼 구현할 수 있다고 합니다.
+<br>
+
+## 제너레이터의 활용
+
+### 비동기 처리
+
+## async / await
+
+> clear style of using Promise
+
+ES8(2017)에서는 제너레이터보다 간단하고 가독성 좋게 비동기 처리를 동기 처리처럼 동작하도록 구현할 수 있는 `async/await`가 도입되었습니다.
+
+`async/await`은 **프로미스를 기반으로 동작**합니다.
+
+그리고 프로미스의 후속 처리 메서드(then, catch, finally)없이 마치 동기처럼 프로미스가 처리 결과를 반환하도록 구현할 수 있습니다.
