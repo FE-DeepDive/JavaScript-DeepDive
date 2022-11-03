@@ -229,6 +229,88 @@ console.log(res); // { value: 30, done: true }
 
 ES8(2017)에서는 제너레이터보다 간단하고 가독성 좋게 비동기 처리를 동기 처리처럼 동작하도록 구현할 수 있는 `async/await`가 도입되었습니다.
 
-`async/await`은 **프로미스를 기반으로 동작**합니다.
+`async/await`은 \*_프로미스를 기반으로 동작_\합니다.
 
 그리고 프로미스의 후속 처리 메서드(then, catch, finally)없이 마치 동기처럼 프로미스가 처리 결과를 반환하도록 구현할 수 있습니다.
+
+```js
+async function fetchTodo() {
+    try {
+        const url = 'https://jsonplaceholder.typicode.com/todos/1';
+
+        const response = await fetch(url);
+        const todo = await response.json();
+        console.log(todo);
+        // {userId: 1, id: 1, title: 'delectus aut autem', completed: false}
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+fetchTodo();
+```
+
+### async 함수
+
+async 키워드는 번거롭게 프로미스를 쓰지 않아도 자동적으로 함수안에 있는 코드 블록들을 프로미스로 변환합니다.
+
+즉, async 함수는 async 키워드를 사용해 정의하며 언제나 반환값을 resolve 하는 프로미스를 반환합니다.
+
+### await 키워드
+
+await 키워드는 프로미스가 settled 상태(비동기 처리가 수행된 상태)가 될 때까지 대기합니다.
+
+그러다가 settled 상태가 되면 프로미스가 resolve한 처리 결과를 반환합니다.
+
+이는 프로미스 체이닝을 하는 것보다 훨씬 동기적으로 보이는 코드를 작성할 수 있다는 장점이 있습니다.
+
+```js
+const getGithubUserName = async (id) => {
+    try {
+        // fetch 함수가 반환한 프로미스가 settled 상태가 될때까지 대기합니다.
+        // 이후 프로미스가 settled 상태가 되면 프로미스가 resolve한 처리 결과가 res 변수에 할당됩니다.
+        const res = await fetch(`https://api.github.com/users/${id}`);
+
+        const { name } = await res.json();
+        console.log(name); // Junghee Kim
+    } catch (error) {
+        console.log(error);
+    }
+};
+getGithubUserName('wjdgml3834');
+```
+
+이처럼 `await` 키워드는 **다음 실행을 일시 중지했다가 프로미스가 settled 상태가 되면 다시 재개합니다.**
+
+그런데, 모든 프로미스에 await 키워드를 사용하는 것은 주의해야 합니다. 다음 예제를 살펴보죠.
+
+```js
+async function foo() {
+    const a = await new Promise((resolve) => setTimeout(() => resolve(1), 3000));
+    const b = await new Promise((resolve) => setTimeout(() => resolve(2), 2000));
+    const c = await new Promise((resolve) => setTimeout(() => resolve(3), 1000));
+    console.log([a, b, c]); // [ 1, 2, 3 ]
+}
+foo(); // 약 6초 소요됩니다.
+```
+
+서로 연관이 없이 개별적으로 수행되는 비동기 처리는 앞의 비동기 처리가 끝날 때까지 대기하여 순차적으로 처리할 필요가 없습니다.
+
+따라서 다음과 같이 코드를 수정할 수 있습니다.
+
+```js
+async function foo() {
+    const res = await Promise.all([
+        new Promise((resolve) => setTimeout(() => resolve(1), 3000)),
+        new Promise((resolve) => setTimeout(() => resolve(2), 2000)),
+        new Promise((resolve) => setTimeout(() => resolve(3), 1000)),
+    ]);
+
+    console.log(res); // [ 1, 2, 3 ]
+}
+foo(); // 약 3초 소요됩니다.
+```
+
+<br>
+
+## 에러처리
