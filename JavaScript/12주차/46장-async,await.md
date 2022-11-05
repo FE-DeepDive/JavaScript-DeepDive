@@ -219,10 +219,6 @@ console.log(res); // { value: 30, done: true }
 이러한 제너레이터 특성을 활용하면 비동기 처리를 동기처럼 구현할 수 있다고 합니다.
 <br>
 
-## 제너레이터의 활용
-
-### 비동기 처리
-
 ## async / await
 
 > clear style of using Promise
