@@ -16,36 +16,52 @@ export class DoubleLinkedList {
     this.cnt = val ? 1 : 0;
   }
 
+  get prevNode() {
+    return this.node.prev ?? this.node;
+  }
+
+  get nextNode() {
+    return this.node.next ?? this.node;
+  }
+
   // [x] insert메서드를 통해 특정 인덱스의 노드에 삽입할 수 있어야 해요.
   insert(val) {
-    if (val === null) throw new Error('값은 null이 될 수 없습니다.');
-
     if (!this.cnt) {
       const nowNode = new Node(val);
       this.node = nowNode;
       this.head = nowNode;
       this.tail = nowNode;
-
-      this.cnt += 1;
-
-      return this;
+    } else {
+      const nowNode = new Node(val, this.node, this.node.next ?? this.head);
+      this.nextNode.prev = nowNode;
+      this.node.next = nowNode;
+      this.node = nowNode;
+  
+      if (this.node.next === this.head) this.tail = nowNode;  
     }
 
-    const nowNode = new Node(val, this.node, this.node.next ?? this.head);
-    this.node.next = nowNode;
-    this.node = nowNode;
-
-    if (this.node.next === this.head) this.tail = nowNode;
-
     this.cnt += 1;
+
     return this;
   }
 
   //  [x] get를 통해 원하는 인덱스의 노드를 가져올 수 있어야 해요.
-  getNthNode(order) {
+  getNthNodeFromHead(order) {
     let i = 0;
     let now = this.head;
     while (i < order) {
+      i += 1;
+      now = now.next;
+    }
+
+    return now;
+  }
+
+  getNthNode(order) {
+    let i = 0;
+    let now = this.node;
+    while (i < order) {
+      i += 1;
       now = now.next;
     }
 
@@ -69,19 +85,37 @@ export class DoubleLinkedList {
 
     if (this.cnt === 1) {
       this.node = null;
+
       this.head = null;
       this.tail = null;
-
-      this.cnt -= 1;
-      return this;
+    } else {
+      this.nextNode.prev = this.node.prev;
+      this.prevNode.next = this.node.next;
+  
+      if (this.head === this.node) this.head = this.node.next;
+      this.node = this.node.next;
     }
 
-    this.node.next.prev = this.node.prev;
-    this.node.prev.next = this.node.next;
+    this.cnt -= 1;
+
+    return this;
+  }
+
+  goPrev() {
+    if (this.cnt === 0) return this;
+    if (this.cnt === 1) return this.node;
+
+    this.node = this.node.prev;
+    
+    return this;
+  }
+
+  goNext() {
+    if (this.cnt === 0) return this;
+    if (this.cnt === 1) return this.node;
 
     this.node = this.node.next;
-
-    this.cnt -= 1;
+    
     return this;
   }
 
