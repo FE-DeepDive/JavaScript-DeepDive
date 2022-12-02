@@ -72,7 +72,7 @@ class DoublyLinkedList {
     this.head.prev = null;
     this.length--;
     
-    return true;
+    return shiftedHead;
 }
 
   /**
