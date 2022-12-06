@@ -1,7 +1,8 @@
 /**
  * 양방향 연결리스트는 각 노드의 prev와 next로 이동할 수 있어야 한다.
  */
-class Node {
+
+ class Node {
   constructor(value) {
     this.prev = null;
     this.value = value;
@@ -15,12 +16,16 @@ class DoublyLinkedList {
     this.tail = null;
     this.length = 0;
   }
+  
+  checkindexValidation (index) {
+    if (index < 0 || index > this.length - 1) return true;
+  }
 
   /** 
   * push를 통해 양방향 연결리스트 꼬리에 값을 추가할 수 있다.
   */
   push(value) {
-    let newNode = new Node(value);
+    const newNode = new Node(value);
     if (!this.head) {
       this.head = newNode;
       this.tail = newNode;
@@ -36,15 +41,17 @@ class DoublyLinkedList {
    * insert를 통해 특정 인덱스의 노드에 삽입할 수 있어야 한다.
    */
   insert(index, value) {
-    if (index < 0 || index > index.length) return false;
+    if(this.checkindexValidation(index)) return false
     if (index === this.length - 1) return !!this.push(value);
 
-    let newNode = new Node(value);
-    let previousNode = this.get(index);
-
-    newNode.next = previousNode.next;
+    const newNode = new Node(value);
+    const previousNode = this.get(index);
+    const afterNode = previousNode.next;
+    newNode.next = afterNode;
+    
     newNode.prev = previousNode;
     previousNode.next = newNode;
+    afterNode.prev = newNode;
     this.length++;
 
     return true;
@@ -54,6 +61,7 @@ class DoublyLinkedList {
  * get을 통해 원하는 인덱스의 노드를 가져온다.
  */
   get(index) {
+    if(this.checkindexValidation(index)) return false
     let counter = 0;
     let currentNode = this.head;
     while (counter < index) {
@@ -68,20 +76,31 @@ class DoublyLinkedList {
    */
   shift() {
     const shiftedHead = this.head;
+    
+    if(!this.head) return undefined;
+    if(this.length === 1){
+      this.head = null;
+      this.tail = null;
+    } else{
     this.head = shiftedHead.next;
     this.head.prev = null;
+    }
     this.length--;
-    
     return shiftedHead;
+    
 }
 
   /**
    * remove를 통해 원하는 인덱스의 노드를 삭제한다.
    */
   remove(index) {
-    let currentNode = this.get(index);
-    let previousNode = currentNode.prev;
-    let afterNode = currentNode.next;
+    if (this.checkindexValidation(index)) return false;
+    if (index === 0) return this.shift();
+    if (index === this.length-1) return this.pop();
+    
+    const currentNode = this.get(index);
+    const previousNode = currentNode.prev;
+    const afterNode = currentNode.next;
 
     previousNode.next = afterNode;
     afterNode.prev = previousNode;
@@ -95,9 +114,15 @@ class DoublyLinkedList {
    */
   pop() {
     const poppedTail = this.tail;
+    
+    if(!this.head) return undefined;
+    if(this.length === 1){
+      this.head = null;
+      this.tail = null;
+    } else{
     this.tail = poppedTail.prev;
     this.tail.next = null;
-    
+    }
     this.length--;
 
     return poppedTail;
@@ -107,9 +132,9 @@ class DoublyLinkedList {
    * update를 통해 원하는 인덱스의 노드를 수정할 수 있다.
    */
   update(index, value) {
-    if (index < 0 || index > this.length) return false;
+    if(this.checkindexValidation(index)) return false
 
-    let currentNode = this.get(index);
+    const currentNode = this.get(index);
     currentNode.value = value;
 
     return true;
