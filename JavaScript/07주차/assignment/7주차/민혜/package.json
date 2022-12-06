@@ -1,0 +1,10 @@
+{
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.3.1"
+  }
+}
